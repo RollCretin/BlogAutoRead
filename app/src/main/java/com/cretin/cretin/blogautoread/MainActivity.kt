@@ -1,5 +1,6 @@
 package com.cretin.cretin.blogautoread
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -184,6 +185,7 @@ class MainActivity : AppCompatActivity() {
     var currPosition: Int = 0
     var timer: Timer? = null
 
+    @SuppressLint("WrongViewCast")
     private fun initData() {
         //获取数据
         list = mutableListOf<UrlData>()
@@ -219,6 +221,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("WrongViewCast")
     fun showSelect(type: Int, position: Int) {
         val datas = arrayListOf<String>()
         for (i in 1..20) {
@@ -245,5 +248,13 @@ class MainActivity : AppCompatActivity() {
             }
         })
         picker.show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        if (timer != null) {
+            timer?.cancel()
+            timer = null
+        }
     }
 }
