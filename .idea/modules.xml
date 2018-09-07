@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/BlogAutoRead.iml" filepath="$PROJECT_DIR$/BlogAutoRead.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/httpurlconnectionutil/httpurlconnectionutil.iml" filepath="$PROJECT_DIR$/httpurlconnectionutil/httpurlconnectionutil.iml" />
     </modules>
   </component>
 </project>

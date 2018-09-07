@@ -38,4 +38,5 @@ dependencies {
     compile 'com.orhanobut:hawk:2.0.1'
     implementation files('libs/jsoup-1.11.3.jar')
     implementation 'com.github.addappcn:android-pickers:1.0.2'
+    implementation project(':httpurlconnectionutil')
 }

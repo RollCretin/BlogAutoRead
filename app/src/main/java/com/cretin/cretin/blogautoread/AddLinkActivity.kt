@@ -2,31 +2,33 @@ package com.cretin.cretin.blogautoread
 
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
-import android.graphics.Color
+import android.content.DialogInterface
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.AsyncTask
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.DividerItemDecoration
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.text.TextUtils
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.EditText
 import android.widget.TextView
+import cn.addapp.pickers.listeners.OnItemPickListener
+import cn.addapp.pickers.picker.SinglePicker
 import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseQuickAdapter
 import com.chad.library.adapter.base.BaseViewHolder
+import com.cretin.cretin.blogautoread.model.ResultModel
 import com.cretin.cretin.blogautoread.model.UrlData
+import com.cretin.www.httpurlconnectionutil.HttpUtils
+import com.cretin.www.httpurlconnectionutil.callback.HttpCallbackModelListener
 import com.orhanobut.hawk.Hawk
 import org.jsoup.Jsoup
 import java.net.URL
-import com.blankj.utilcode.util.FragmentUtils.setBackgroundColor
-import android.support.v4.view.ViewCompat.setAlpha
-import cn.addapp.pickers.widget.WheelView
-import cn.addapp.pickers.common.LineConfig
-import java.util.*
-import cn.addapp.pickers.listeners.OnItemPickListener
-import cn.addapp.pickers.listeners.OnSingleWheelListener
-import cn.addapp.pickers.picker.SinglePicker
 
 
 class AddLinkActivity : AppCompatActivity() {
@@ -65,6 +67,23 @@ class AddLinkActivity : AppCompatActivity() {
             } else {
                 addUrl(url, title)
             }
+        }
+
+        //清空数据
+        findViewById<TextView>(R.id.tv_clear).setOnClickListener {
+            AlertDialog.Builder(this)
+                    .setMessage("确定要清空所有数据吗?")
+                    .setTitle("警告")
+                    .setNegativeButton("取消", DialogInterface.OnClickListener { dialog, whitch ->
+                        dialog.dismiss()
+                    })
+                    .setPositiveButton("删除", DialogInterface.OnClickListener { dialog, whitch ->
+                        list?.clear()
+                        adapter?.notifyDataSetChanged()
+                        Hawk.delete("list")
+                        dialog.dismiss()
+                    })
+                    .show()
         }
 
         //重置
@@ -139,6 +158,7 @@ class AddLinkActivity : AppCompatActivity() {
         if (dialog == null) {
             dialog = ProgressDialog.show(this, "", "正在解析，请稍后...")
         }
+        dialog?.setMessage("正在解析，请稍后...")
         dialog?.show()
         Task().execute(url)
     }
@@ -165,5 +185,61 @@ class AddLinkActivity : AppCompatActivity() {
             helper?.setText(R.id.tv_link, "网页链接：" + item?.url)
             helper?.setVisible(R.id.tv_time, false)
         }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_layout, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        //显示对话框填写信息
+        var view = LayoutInflater.from(this).inflate(R.layout.dialog_input, null)
+        AlertDialog.Builder(this)
+                .setMessage("请输入请求链接")
+                .setTitle("提示")
+                .setView(view)
+                .setNegativeButton("取消", DialogInterface.OnClickListener { dialog, whitch ->
+                    dialog.dismiss()
+                })
+                .setPositiveButton("确定", DialogInterface.OnClickListener { dialog, whitch ->
+                    val toString = view.findViewById<EditText>(R.id.ed_content).text?.toString()
+                    if (TextUtils.isEmpty(toString)) {
+                        return@OnClickListener
+                    }
+                    doDownloadData(toString)
+                    dialog.dismiss()
+                })
+                .show()
+
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun doDownloadData(text: String?) {
+        if (dialog == null) {
+            dialog = ProgressDialog.show(this, "", "正在解析，请稍后...")
+        }
+        dialog?.setMessage("正在请求中...")
+        dialog?.show()
+        HttpUtils.doGet(this, text, object : HttpCallbackModelListener<ResultModel> {
+            override fun onFinish(response: ResultModel) {
+                var num = 0
+                response.list.forEach {
+                    if (!list?.contains(it)!!) {
+                        list?.add(0, it)
+                        num++
+                    }
+                }
+                adapter?.notifyDataSetChanged()
+                if (dialog != null && dialog?.isShowing!!)
+                    dialog?.dismiss()
+                ToastUtils.showLong("添加成功 " + num + "条")
+                Hawk.put("list", list)
+            }
+
+            override fun onError(e: Exception) {
+                ToastUtils.showLong("请求失败")
+            }
+        }, ResultModel::class.java)
     }
 }
