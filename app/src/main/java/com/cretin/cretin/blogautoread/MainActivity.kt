@@ -12,6 +12,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.cretin.cretin.blogautoread.model.UrlData
 import com.orhanobut.hawk.Hawk
 import android.support.v7.widget.DividerItemDecoration
+import android.view.WindowManager
 import android.widget.EditText
 import cn.addapp.pickers.listeners.OnItemPickListener
 import cn.addapp.pickers.picker.SinglePicker
@@ -132,6 +133,16 @@ class MainActivity : AppCompatActivity() {
         taskState = false
 
         doit(listDoing?.get(currPosition % listDoing?.size!!)?.url!!)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     private fun doit(url: String) {
