@@ -12,7 +12,9 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.cretin.cretin.blogautoread.model.UrlData
 import com.orhanobut.hawk.Hawk
 import android.support.v7.widget.DividerItemDecoration
+import android.view.View
 import android.view.WindowManager
+import android.widget.AdapterView
 import android.widget.EditText
 import cn.addapp.pickers.listeners.OnItemPickListener
 import cn.addapp.pickers.picker.SinglePicker
@@ -204,6 +206,13 @@ class MainActivity : AppCompatActivity() {
         recyclerView?.addItemDecoration(DividerItemDecoration(this, DividerItemDecoration.VERTICAL))
         adapter = RecyclerAdapter(R.layout.item_recycler, list)
         recyclerView?.adapter = adapter
+        adapter?.setOnItemClickListener { adapter, view, position ->
+            var url: String = list?.get(position)?.url!!
+            var intent = Intent(this@MainActivity, ShowDetailActivity::class.java)
+            intent.putExtra("url", url)
+            intent.putExtra("flag", true)
+            startActivityForResult(intent, 100)
+        }
 
         //设置初始值
         var time1: Long? = Hawk.get<Long>("zx_time")

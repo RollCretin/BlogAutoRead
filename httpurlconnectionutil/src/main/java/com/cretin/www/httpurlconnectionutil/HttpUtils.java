@@ -57,9 +57,9 @@ public class HttpUtils {
                     // 设置请求方式，默认为GET
                     httpURLConnection.setRequestMethod("GET");
                     // 设置连接超时
-                    httpURLConnection.setConnectTimeout(5000);
+                    httpURLConnection.setConnectTimeout(30000);
                     // 设置读取超时
-                    httpURLConnection.setReadTimeout(8000);
+                    httpURLConnection.setReadTimeout(30000);
                     // 响应码为200表示成功，否则失败。
                     if ( httpURLConnection.getResponseCode() == 200 ) {
                         // 获取网络的输入流
@@ -121,9 +121,9 @@ public class HttpUtils {
                     // 设置请求方式，默认为GET
                     httpURLConnection.setRequestMethod("GET");
                     // 设置连接超时
-                    httpURLConnection.setConnectTimeout(5000);
+                    httpURLConnection.setConnectTimeout(30000);
                     // 设置读取超时
-                    httpURLConnection.setReadTimeout(8000);
+                    httpURLConnection.setReadTimeout(30000);
                     // 响应码为200表示成功，否则失败。
                     if ( httpURLConnection.getResponseCode() != 200 ) {
                         new ResponseCall(context, listener).doFail(
@@ -190,9 +190,9 @@ public class HttpUtils {
                     // 设置请求方式，默认为GET
                     httpURLConnection.setRequestMethod("GET");
                     // 设置连接超时
-                    httpURLConnection.setConnectTimeout(5000);
+                    httpURLConnection.setConnectTimeout(30000);
                     // 设置读取超时
-                    httpURLConnection.setReadTimeout(8000);
+                    httpURLConnection.setReadTimeout(30000);
                     // 响应码为200表示成功，否则失败。
                     if ( httpURLConnection.getResponseCode() == 200 ) {
                         // 获取网络的输入流
@@ -269,8 +269,8 @@ public class HttpUtils {
                             .valueOf(out.length()));
                     httpURLConnection.setRequestMethod("POST");
 
-                    httpURLConnection.setConnectTimeout(5000);
-                    httpURLConnection.setReadTimeout(8000);
+                    httpURLConnection.setConnectTimeout(30000);
+                    httpURLConnection.setReadTimeout(30000);
 
                     // 设置运行输入
                     httpURLConnection.setDoInput(true);
@@ -356,8 +356,8 @@ public class HttpUtils {
                             .valueOf(out.length()));
                     httpURLConnection.setRequestMethod("POST");
 
-                    httpURLConnection.setConnectTimeout(5000);
-                    httpURLConnection.setReadTimeout(8000);
+                    httpURLConnection.setConnectTimeout(30000);
+                    httpURLConnection.setReadTimeout(30000);
 
                     // 设置运行输入
                     httpURLConnection.setDoInput(true);
@@ -450,8 +450,8 @@ public class HttpUtils {
 
                     httpURLConnection.setRequestMethod("POST");
 
-                    httpURLConnection.setConnectTimeout(5000);
-                    httpURLConnection.setReadTimeout(8000);
+                    httpURLConnection.setConnectTimeout(30000);
+                    httpURLConnection.setReadTimeout(30000);
 
                     // 设置运行输入
                     httpURLConnection.setDoInput(true);

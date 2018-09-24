@@ -15,6 +15,8 @@ import java.util.*
 
 class ShowDetailActivity : AppCompatActivity() {
     private var mAgentWeb: AgentWeb? = null
+    private var mFlag = false
+    private var timer:Timer? = null
 
     @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,6 +26,7 @@ class ShowDetailActivity : AppCompatActivity() {
         supportActionBar?.hide()
 
         var url = intent.getStringExtra("url")
+        mFlag = intent.getBooleanExtra("flag", false)
         mAgentWeb = AgentWeb.with(this)//传入Activity
                 .setAgentWebParent(findViewById<LinearLayout>(R.id.container), LinearLayout.LayoutParams(-1, -1))//传入AgentWeb 的父控件 ，如果父控件为 RelativeLayout ， 那么第二参数需要传入 RelativeLayout.LayoutParams ,第一个参数和第二个参数应该对应。
                 .useDefaultIndicator()// 使用默认进度条
@@ -41,19 +44,21 @@ class ShowDetailActivity : AppCompatActivity() {
             }
         }
 
-        //启动一个定时器 3秒后关闭
-        var time: Long? = Hawk.get<Long>("d_time")
-        if (time == null || time == 0L) {
-            time = 3
-        }
-        val timer = Timer()
-        timer.schedule(object : TimerTask() {
-            override fun run() {
-                val intent = Intent()
-                setResult(100, intent)
-                finish()
+        if (!mFlag) {
+            //启动一个定时器 3秒后关闭
+            var time: Long? = Hawk.get<Long>("d_time")
+            if (time == null || time == 0L) {
+                time = 3
             }
-        }, time * 1000)
+            timer = Timer()
+            timer?.schedule(object : TimerTask() {
+                override fun run() {
+                    val intent = Intent()
+                    setResult(100, intent)
+                    finish()
+                }
+            }, time * 1000)
+        }
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
@@ -70,5 +75,10 @@ class ShowDetailActivity : AppCompatActivity() {
     override fun onResume() {
         mAgentWeb?.webLifeCycle?.onResume()
         super.onResume()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timer?.cancel()
     }
 }
