@@ -168,6 +168,10 @@ class MainActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100 && resultCode == 100) {
+            if (currPosition % (listDoing?.size!!) == listDoing?.size!! - 1) {
+                //说明一个轮回结束了 乱序一下当前列表
+                Collections.shuffle(listDoing)
+            }
             var d1 = listDoing!![currPosition % listDoing?.size!!]
             var d = d1.copy()
             d.time = TimeUtils.getNowString().toString()
