@@ -12,9 +12,7 @@ import com.chad.library.adapter.base.BaseViewHolder
 import com.cretin.cretin.blogautoread.model.UrlData
 import com.orhanobut.hawk.Hawk
 import android.support.v7.widget.DividerItemDecoration
-import android.view.View
 import android.view.WindowManager
-import android.widget.AdapterView
 import android.widget.EditText
 import cn.addapp.pickers.listeners.OnItemPickListener
 import cn.addapp.pickers.picker.SinglePicker
@@ -32,11 +30,13 @@ class MainActivity : AppCompatActivity() {
     var edTime: EditText? = null
     var btnStart: TextView? = null
     var btnStop: TextView? = null
-    var taskState: Boolean = false
+    var taskState: Int = 0 //0 正常 1 终止 2 暂停
     var mTime: Int = 0
     var dTime: Int = 0
     var tvTips: TextView? = null
+    var btnPause: TextView? = null
 
+    @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         btnStart = findViewById(R.id.tv_start)
         btnStop = findViewById(R.id.tv_finish)
         tvTips = findViewById(R.id.tv_tips)
+        btnPause = findViewById(R.id.tv_pause)
 
         initData()
 
@@ -56,6 +57,11 @@ class MainActivity : AppCompatActivity() {
         //开始任务
         findViewById<TextView>(R.id.tv_start).setOnClickListener {
             startTask()
+        }
+
+        //暂停任务 所谓暂停任务就是停止下一轮的timer
+        findViewById<TextView>(R.id.tv_pause).setOnClickListener {
+            parseTask()
         }
 
         //设置执行次数
@@ -85,41 +91,64 @@ class MainActivity : AppCompatActivity() {
             adapter?.notifyDataSetChanged()
         }
 
-        //开始任务
+        //终止任务
         findViewById<TextView>(R.id.tv_finish).setOnClickListener {
             //终止任务
-            taskState = true
+            taskState = 1
             timer?.cancel()
             timer = null
             btnStart?.isEnabled = true
             btnStop?.isEnabled = false
+            btnPause?.isEnabled = false
             ToastUtils.showLong("任务被终止")
         }
     }
 
     /**
+     * 暂停任务
+     */
+    private fun parseTask() {
+        taskState = 2
+        timer?.cancel()
+        timer = null
+        btnStart?.isEnabled = true
+        btnStop?.isEnabled = true
+        btnPause?.isEnabled = false
+        ToastUtils.showLong("任务被暂停")
+    }
+
+    /**
      * 开始任务
      */
+    @SuppressLint("WrongViewCast")
     private fun startTask() {
         //从缓存中拿数据
-        var listDoings = Hawk.get<MutableList<UrlData>>("list")
-        if (listDoings == null || listDoings?.isEmpty()!!) {
-            //没有数据
-            ToastUtils.showLong("本地没有可以处理的链接")
-            return
-        }
-        listDoing = mutableListOf()
-        listDoings.forEach {
-            var d: UrlData = it
-            if (d.state == UrlData.TYPE_OK) {
-                listDoing?.add(d)
+        if (taskState == 1 || taskState == 0) {
+            var listDoings = Hawk.get<MutableList<UrlData>>("list")
+            if (listDoings == null || listDoings?.isEmpty()!!) {
+                //没有数据
+                ToastUtils.showLong("本地没有可以处理的链接")
+                return
             }
+            list?.clear()
+            currPosition = 0
+            listDoing = mutableListOf()
+            listDoings.forEach {
+                var d: UrlData = it
+                if (d.state == UrlData.TYPE_OK) {
+                    listDoing?.add(d)
+                }
+            }
+            adapter?.notifyDataSetChanged()
+            ToastUtils.showLong("任务已开始")
+        } else {
+            ToastUtils.showLong("任务已继续")
         }
+
         if (listDoing?.isEmpty()!!) {
             ToastUtils.showLong("本地没有可以处理的链接")
             return
         }
-        currPosition = 0
         //开始对listDoing循环进行操作
         var taskTimeStr = findViewById<TextView>(R.id.tv_zx)?.text?.toString()
         taskTime = taskTimeStr?.substring(5, taskTimeStr.length - 1)?.toInt()!!
@@ -127,12 +156,11 @@ class MainActivity : AppCompatActivity() {
         mTime = mTimeStr?.substring(4, mTimeStr.length - 1)?.toInt()!!
         var dTimeStr = findViewById<TextView>(R.id.tv_dt)?.text?.toString()
         dTime = dTimeStr?.substring(4, dTimeStr.length - 1)?.toInt()!!
-        list?.clear()
-        adapter?.notifyDataSetChanged()
-        ToastUtils.showLong("任务已开始")
+
         btnStart?.isEnabled = false
         btnStop?.isEnabled = true
-        taskState = false
+        btnPause?.isEnabled = true
+        taskState = 0
 
         doit(listDoing?.get(currPosition % listDoing?.size!!)?.url!!)
     }
@@ -176,26 +204,38 @@ class MainActivity : AppCompatActivity() {
             var d = d1.copy()
             d.time = TimeUtils.getNowString().toString()
             //任务被终止
-            if (taskState) {
+            if (taskState == 1) {
                 list?.add(0, d)
-                adapter?.notifyDataSetChanged()
+                adapter?.notifyItemRangeChanged(0,1)
                 btnStart?.isEnabled = true
                 btnStop?.isEnabled = false
+                btnPause?.isEnabled = false
                 ToastUtils.showLong("任务已提前被终止")
+                return
+            }
+            //任务被暂停
+            if (taskState == 2) {
+                list?.add(0, d)
+                adapter?.notifyItemRangeChanged(0,1)
+                btnStart?.isEnabled = true
+                btnStop?.isEnabled = true
+                btnPause?.isEnabled = false
+                ToastUtils.showLong("任务被暂停")
                 return
             }
             currPosition++
             if (currPosition >= taskTime * listDoing?.size!!) {
                 list?.add(0, d)
-                adapter?.notifyDataSetChanged()
+                adapter?.notifyItemRangeChanged(0,1)
                 btnStart?.isEnabled = true
                 btnStop?.isEnabled = false
+                btnPause?.isEnabled = false
                 ToastUtils.showLong("任务已完成")
                 return
             }
             doit(listDoing?.get(currPosition % listDoing?.size!!)?.url!!)
             list?.add(0, d)
-            adapter?.notifyItemRemoved(0)
+            adapter?.notifyItemRangeChanged(0,1)
         }
     }
 

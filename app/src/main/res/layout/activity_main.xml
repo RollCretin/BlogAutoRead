@@ -80,7 +80,8 @@
             android:layout_weight="1"
             android:background="@drawable/button_bg"
             android:gravity="center"
-            android:padding="10dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:text="链接管理"
             android:textColor="#666666"
             android:textSize="14sp" />
@@ -94,7 +95,8 @@
             android:layout_weight="1"
             android:background="@drawable/button_bg"
             android:gravity="center"
-            android:padding="10dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:text="清除日志"
             android:textColor="#666666"
             android:textSize="14sp" />
@@ -108,13 +110,14 @@
             android:layout_weight="1"
             android:background="@drawable/button_bg"
             android:gravity="center"
-            android:padding="10dp"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
             android:text="开始执行"
             android:textColor="#666666"
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/tv_finish"
+            android:id="@+id/tv_pause"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginLeft="2dp"
@@ -123,10 +126,28 @@
             android:background="@drawable/button_bg"
             android:enabled="false"
             android:gravity="center"
-            android:text="结束任务"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="暂停任务"
             android:textColor="#666666"
             android:textSize="14sp" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_finish"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button_bg"
+        android:enabled="false"
+        android:gravity="center"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp"
+        android:text="结束任务"
+        android:textColor="#666666"
+        android:textSize="14sp" />
 
     <View
         android:layout_width="match_parent"

@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <EditText
+        android:text="http://119.27.186.22:9527/link"
         android:id="@+id/ed_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
