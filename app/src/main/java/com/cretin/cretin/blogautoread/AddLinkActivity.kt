@@ -3,6 +3,7 @@ package com.cretin.cretin.blogautoread
 import android.annotation.SuppressLint
 import android.app.ProgressDialog
 import android.content.DialogInterface
+import android.content.Intent
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.AsyncTask
 import android.os.Bundle
@@ -133,21 +134,28 @@ class AddLinkActivity : AppCompatActivity() {
     private fun showConfirmDialog(position: Int) {
         var data: UrlData? = list?.get(position)
         val datas = arrayListOf<String>()
+        datas.add("打开此链接")
         datas.add("设置为正常")
         datas.add("设置为隐藏")
         datas.add("删除此链接")
         val picker = SinglePicker(this, datas)
         picker.setCanLoop(false)//不禁用循环
         picker.setLineVisible(true)
-        picker.setSelectedIndex(data?.state!!)
-        picker.setOnItemPickListener(OnItemPickListener<String> { index, item ->
-            if (index > 1) {
+        picker.selectedIndex = data?.state!!
+        picker.setOnItemPickListener({ index, item ->
+            if (index == 3) {
                 list?.removeAt(position)
                 adapter?.notifyItemRemoved(position)
-            } else {
+            } else if (index == 1 || index == 2) {
                 data?.state = index
                 list?.set(position, data)
                 adapter?.notifyItemChanged(position)
+            } else if (index == 0) {
+                var url: String = list?.get(position)?.url!!
+                var intent = Intent(this@AddLinkActivity, ShowDetailActivity::class.java)
+                intent.putExtra("url", url)
+                intent.putExtra("flag", true)
+                startActivity(intent)
             }
             Hawk.put("list", list)
         })
